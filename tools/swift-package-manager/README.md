@@ -1,23 +1,58 @@
 # @nx-apple/swift-package-manager
 
-An Nx plugin for managing Swift packages in an Nx workspace. This plugin provides automatic target inference for Swift packages and includes generators for creating new Swift packages.
+[![npm version](https://badge.fury.io/js/@nx-apple%2Fswift-package-manager.svg)](https://badge.fury.io/js/@nx-apple%2Fswift-package-manager)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Nx](https://img.shields.io/badge/Built%20with-Nx-blue.svg)](https://nx.dev)
 
-## Features
+A professional-grade Nx plugin for seamless Swift Package Manager integration. This plugin brings first-class Swift development support to Nx workspaces, enabling teams to build, test, and manage Swift packages with the full power of Nx's build system.
 
-- **Automatic Target Detection**: Automatically detects Swift packages and creates build, test, and lint targets
-- **Dependency Management**: Resolves local Swift package dependencies for the Nx project graph
-- **Swift Package Generator**: Create new Swift packages with proper structure and configuration
-- **Cross-platform Support**: Works with macOS, iOS, and other Swift platforms
+## 🚀 Features
 
-## Installation
+### Core Capabilities
+- **🔍 Automatic Project Discovery**: Zero-configuration detection of Swift packages in your workspace
+- **⚡ Intelligent Target Generation**: Automatically creates optimized build, test, and lint targets
+- **📦 Dependency Management**: Smart resolution of local workspace and remote Git dependencies
+- **🏗️ Code Generation**: Professional project scaffolding with modern Swift best practices
+- **🔄 Workspace Integration**: Full integration with Nx's project graph and affected commands
+
+### Advanced Features
+- **🎯 Cross-Platform Support**: Native support for macOS, iOS, watchOS, and tvOS
+- **📊 Performance Optimization**: Leverages Nx's computational caching for faster builds
+- **🔗 Local Dependencies**: Automatic detection and management of inter-package dependencies
+- **⚙️ Configurable Commands**: Customizable build, test, and lint commands per project
+- **📈 CI/CD Ready**: Optimized for continuous integration workflows
+
+## 📋 Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Generators](#generators)
+- [Executors](#executors)
+- [Dependency Management](#dependency-management)
+- [Advanced Usage](#advanced-usage)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [API Reference](#api-reference)
+
+## 🛠️ Installation
+
+### Prerequisites
+
+- **Node.js** 18+ and **npm** 8+
+- **Swift** 5.9 or later
+- **Xcode** (for iOS/macOS development)
+- **SwiftLint** (optional, for linting support)
+
+### Install the Plugin
 
 ```bash
 npm install --save-dev @nx-apple/swift-package-manager
 ```
 
-## Setup
+### Register the Plugin
 
-Add the plugin to your `nx.json`:
+Add the plugin to your `nx.json` configuration:
 
 ```json
 {
@@ -26,7 +61,7 @@ Add the plugin to your `nx.json`:
       "plugin": "@nx-apple/swift-package-manager",
       "options": {
         "buildCommand": "swift build",
-        "testCommand": "swift test", 
+        "testCommand": "swift test",
         "lintCommand": "swiftlint",
         "includeTestTargets": true,
         "includeLintTargets": true
@@ -36,150 +71,533 @@ Add the plugin to your `nx.json`:
 }
 ```
 
-## Plugin Options
+## 🚀 Quick Start
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `buildCommand` | string | `"swift build"` | Command to build Swift packages |
-| `testCommand` | string | `"swift test"` | Command to run tests |
-| `lintCommand` | string | `"swiftlint"` | Command to lint Swift code |
-| `includeTestTargets` | boolean | `true` | Whether to create test targets |
-| `includeLintTargets` | boolean | `true` | Whether to create lint targets |
-
-## Usage
-
-### Automatic Target Inference
-
-The plugin automatically detects `Package.swift` files in your workspace and creates the following targets:
-
-- **build**: Builds the Swift package
-- **test**: Runs the test suite (if test targets exist)
-- **lint**: Lints the Swift code using SwiftLint
-- **clean**: Cleans build artifacts
-
-### Creating a New Swift Package
-
-Use the generator to create a new Swift package:
+### 1. Generate a New Swift Package
 
 ```bash
-nx g @nx-apple/swift-package-manager:swift-package my-package
+# Create a new library
+npx nx g @nx-apple/swift-package-manager:swift-package MyLibrary
+
+# Create an executable app
+npx nx g @nx-apple/swift-package-manager:swift-package MyApp --type=executable --directory=apps
+
+# Create with specific platforms
+npx nx g @nx-apple/swift-package-manager:swift-package MyCrossplatform \
+  --platforms="macOS(.v14),iOS(.v17),watchOS(.v10)"
 ```
 
-#### Generator Options
+### 2. Add Dependencies
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `name` | string | - | Name of the Swift package (required) |
-| `directory` | string | - | Directory where the package should be created |
-| `type` | `"library"` \| `"executable"` | `"library"` | Type of Swift package |
-| `platforms` | string[] | `["macOS(.v13)", "iOS(.v16)"]` | Supported platforms |
-| `dependencies` | string[] | `[]` | External dependencies |
-| `tags` | string | - | Tags for the project (comma-separated) |
-
-#### Examples
-
-Create a library:
 ```bash
-nx g @nx-apple/swift-package-manager:swift-package MyLibrary --type=library
+# Add a remote dependency
+npx nx g @nx-apple/swift-package-manager:add-dependency \
+  --project=MyLibrary \
+  --dependencyType=remote \
+  --url=https://github.com/apple/swift-algorithms.git \
+  --version="1.0.0"
+
+# Add a local workspace dependency
+npx nx g @nx-apple/swift-package-manager:add-dependency \
+  --project=MyApp \
+  --dependencyType=local \
+  --localProject=MyLibrary
 ```
 
-Create an executable:
-```bash
-nx g @nx-apple/swift-package-manager:swift-package MyApp --type=executable --directory=apps
-```
-
-Create a package with specific platforms:
-```bash
-nx g @nx-apple/swift-package-manager:swift-package MyPackage --platforms="macOS(.v14),iOS(.v17),watchOS(.v10)"
-```
-
-### Running Targets
-
-Once the plugin detects your Swift packages, you can run the generated targets:
+### 3. Build and Test
 
 ```bash
-# Build a Swift package
-nx build my-package
+# Build your package
+npx nx build MyLibrary
 
 # Run tests
-nx test my-package
+npx nx test MyLibrary
 
 # Lint code (requires SwiftLint)
-nx lint my-package
+npx nx lint MyLibrary
 
 # Clean build artifacts
-nx clean my-package
+npx nx clean MyLibrary
 ```
 
-### Project Structure
+## ⚙️ Configuration
 
-The generator creates Swift packages with the following structure:
+### Plugin Options
+
+Configure the plugin behavior in your `nx.json`:
+
+```json
+{
+  "plugins": [
+    {
+      "plugin": "@nx-apple/swift-package-manager",
+      "options": {
+        "buildCommand": "swift build",
+        "testCommand": "swift test",
+        "lintCommand": "swiftlint",
+        "includeTestTargets": true,
+        "includeLintTargets": true,
+        "buildOutputPath": ".build",
+        "configurationOptions": {
+          "release": "--configuration release",
+          "debug": "--configuration debug"
+        }
+      }
+    }
+  ]
+}
+```
+
+#### Configuration Reference
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `buildCommand` | `string` | `"swift build"` | Base command for building Swift packages |
+| `testCommand` | `string` | `"swift test"` | Command for running tests |
+| `lintCommand` | `string` | `"swiftlint"` | Command for linting Swift code |
+| `includeTestTargets` | `boolean` | `true` | Generate test targets for packages with tests |
+| `includeLintTargets` | `boolean` | `true` | Generate lint targets (requires SwiftLint) |
+| `buildOutputPath` | `string` | `".build"` | Directory for build artifacts |
+| `configurationOptions` | `object` | `{}` | Additional build configuration flags |
+
+### Project-Level Configuration
+
+Override plugin settings for specific projects in `project.json`:
+
+```json
+{
+  "name": "my-package",
+  "targets": {
+    "build": {
+      "executor": "@nx-apple/swift-package-manager:swift",
+      "options": {
+        "command": "build",
+        "args": ["--configuration", "release", "--arch", "arm64"]
+      }
+    }
+  }
+}
+```
+
+## 🏗️ Generators
+
+### Swift Package Generator
+
+Creates new Swift packages with professional project structure.
+
+```bash
+npx nx g @nx-apple/swift-package-manager:swift-package <name> [options]
+```
+
+#### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | `string` | - | Package name (required) |
+| `directory` | `string` | - | Target directory for the package |
+| `type` | `"library"` \| `"executable"` | `"library"` | Package type |
+| `platforms` | `string[]` | `["macOS(.v13)", "iOS(.v16)"]` | Supported platforms |
+| `dependencies` | `string[]` | `[]` | Initial external dependencies |
+| `tags` | `string` | - | Project tags (comma-separated) |
+| `skipFormat` | `boolean` | `false` | Skip formatting generated files |
+
+#### Generated Project Structure
 
 ```
-swift-packages/
-├── my-package/
-│   ├── Package.swift
-│   ├── README.md
-│   ├── .swiftlint.yml
-│   ├── Sources/
-│   │   └── MyPackage/
-│   │       └── MyPackage.swift
-│   └── Tests/
-│       └── MyPackageTests/
-│           └── MyPackageTests.swift
+packages/my-library/
+├── Package.swift                    # Swift package manifest
+├── README.md                        # Project documentation
+├── .swiftlint.yml                   # SwiftLint configuration
+├── Sources/
+│   └── MyLibrary/
+│       └── MyLibrary.swift          # Main library file
+├── Tests/
+│   └── MyLibraryTests/
+│       └── MyLibraryTests.swift     # Test suite
+└── project.json                     # Nx project configuration
 ```
 
-### Dependency Management
+### Add Dependency Generator
 
-The plugin automatically detects dependencies between Swift packages in your workspace:
+Adds dependencies to existing Swift packages.
+
+```bash
+npx nx g @nx-apple/swift-package-manager:add-dependency [options]
+```
+
+#### Remote Dependencies
+
+```bash
+npx nx g @nx-apple/swift-package-manager:add-dependency \
+  --project=MyPackage \
+  --dependencyType=remote \
+  --url=https://github.com/apple/swift-nio.git \
+  --version="2.0.0"
+```
+
+#### Local Dependencies
+
+```bash
+npx nx g @nx-apple/swift-package-manager:add-dependency \
+  --project=MyApp \
+  --dependencyType=local \
+  --localProject=SharedUtils
+```
+
+#### Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `project` | `string` | Target project name (required) |
+| `dependencyType` | `"remote"` \| `"local"` | Dependency source type (required) |
+| `url` | `string` | Git URL (required for remote) |
+| `localProject` | `string` | Local project name (required for local) |
+| `version` | `string` | Version constraint |
+| `targets` | `string[]` | Specific targets to add dependency to |
+| `productName` | `string` | Specific product name to import |
+
+### Remove Dependency Generator
+
+Removes dependencies from Swift packages.
+
+```bash
+npx nx g @nx-apple/swift-package-manager:remove-dependency \
+  --project=MyPackage \
+  --dependency=swift-algorithms
+```
+
+#### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `project` | `string` | - | Target project name (required) |
+| `dependency` | `string` | - | Dependency name or URL (required) |
+| `targets` | `string[]` | `[]` | Specific targets to remove from |
+| `removeFromPackage` | `boolean` | `true` | Remove from package dependencies |
+
+## ⚡ Executors
+
+### Swift Executor
+
+Executes Swift commands with enhanced Nx integration.
+
+```json
+{
+  "targets": {
+    "build": {
+      "executor": "@nx-apple/swift-package-manager:swift",
+      "options": {
+        "command": "build",
+        "args": ["--configuration", "release"]
+      }
+    }
+  }
+}
+```
+
+#### Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `command` | `string` | Swift command to execute |
+| `args` | `string[]` | Additional command arguments |
+| `cwd` | `string` | Working directory (defaults to project root) |
+
+## 📦 Dependency Management
+
+### Local Dependencies
+
+The plugin automatically detects and manages dependencies between Swift packages in your workspace:
 
 ```swift
 // Package.swift
 let package = Package(
     name: "MyApp",
     dependencies: [
-        .package(path: "../MyLibrary"), // Local dependency
-        .package(url: "https://github.com/example/SomePackage", from: "1.0.0")
+        .package(path: "../MyLibrary"),  // ← Automatically detected
+        .package(path: "../SharedUtils") // ← Creates Nx dependency
     ],
     targets: [
         .executableTarget(
             name: "MyApp",
-            dependencies: ["MyLibrary"] // Dependency on local package
+            dependencies: ["MyLibrary", "SharedUtils"]
         )
     ]
 )
 ```
 
-## Requirements
+### Remote Dependencies
 
-- Swift 5.9 or later
-- Xcode (for iOS/macOS development)
-- SwiftLint (optional, for linting support)
+Support for various version specifications:
 
-## Development
-
-### Building the Plugin
-
-```bash
-nx build swift-package-manager
+```swift
+dependencies: [
+    // Exact version
+    .package(url: "https://github.com/apple/swift-nio.git", exact: "2.0.0"),
+    
+    // Version range
+    .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
+    
+    // Branch
+    .package(url: "https://github.com/apple/swift-log.git", branch: "main"),
+    
+    // Revision
+    .package(url: "https://github.com/vapor/vapor.git", revision: "abc123")
+]
 ```
 
-### Testing
+### Dependency Graph Integration
+
+The plugin integrates with Nx's project graph:
 
 ```bash
-nx test swift-package-manager
+# Visualize your dependency graph
+npx nx graph
+
+# Build only affected projects
+npx nx affected:build
+
+# Test affected projects
+npx nx affected:test
 ```
 
-### Linting
+## 🔧 Advanced Usage
+
+### Custom Build Configurations
+
+```json
+{
+  "targets": {
+    "build-release": {
+      "executor": "@nx-apple/swift-package-manager:swift",
+      "options": {
+        "command": "build",
+        "args": ["--configuration", "release", "--arch", "arm64"]
+      }
+    },
+    "build-debug": {
+      "executor": "@nx-apple/swift-package-manager:swift",
+      "options": {
+        "command": "build",
+        "args": ["--configuration", "debug"]
+      }
+    }
+  }
+}
+```
+
+### Platform-Specific Builds
+
+```json
+{
+  "targets": {
+    "build-ios": {
+      "executor": "@nx-apple/swift-package-manager:swift",
+      "options": {
+        "command": "build",
+        "args": [
+          "--configuration", "release",
+          "--destination", "generic/platform=iOS"
+        ]
+      }
+    }
+  }
+}
+```
+
+### Integration with CI/CD
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build affected projects
+        run: npx nx affected:build
+      
+      - name: Test affected projects
+        run: npx nx affected:test
+      
+      - name: Lint affected projects
+        run: npx nx affected:lint
+```
+
+## 📚 Best Practices
+
+### Project Organization
+
+```
+apps/
+├── ios-app/                 # iOS application
+├── macos-app/              # macOS application  
+└── cli-tool/               # Command-line executable
+
+libs/
+├── core/                   # Core business logic
+├── ui-kit/                 # Reusable UI components
+├── networking/             # Network layer
+├── storage/                # Data persistence
+└── utilities/              # Shared utilities
+```
+
+### Naming Conventions
+
+- **Projects**: `kebab-case` (e.g., `user-authentication`)
+- **Swift packages**: `PascalCase` (e.g., `UserAuthentication`)
+- **Tags**: Use consistent tagging strategy (`scope:shared`, `type:lib`, `platform:ios`)
+
+### Dependency Strategy
+
+1. **Local First**: Prefer local workspace dependencies over duplicated code
+2. **Version Pinning**: Pin external dependencies to specific versions in production
+3. **Regular Updates**: Schedule regular dependency updates and security audits
+4. **Testing**: Maintain comprehensive tests for all dependencies
+
+### Performance Optimization
+
+- **Caching**: Leverage Nx's computation caching for faster builds
+- **Incremental Builds**: Use `nx affected` commands in CI/CD
+- **Parallel Execution**: Configure parallel task execution for large workspaces
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### "Package.swift not found"
+```bash
+# Ensure Package.swift exists in project root
+ls packages/my-project/Package.swift
+
+# Regenerate project if needed
+npx nx g @nx-apple/swift-package-manager:swift-package my-project --force
+```
+
+#### "Swift command not found"
+```bash
+# Verify Swift installation
+swift --version
+
+# Install Swift if needed (macOS)
+xcode-select --install
+```
+
+#### "Local dependency not found"
+```bash
+# Verify project exists in workspace
+npx nx show projects
+
+# Check project.json configuration
+cat packages/my-project/project.json
+```
+
+#### Build failures
+```bash
+# Clean build artifacts
+npx nx clean my-project
+
+# Reset Nx cache
+npx nx reset
+
+# Rebuild with verbose output
+npx nx build my-project --verbose
+```
+
+### Debug Mode
+
+Enable verbose logging for troubleshooting:
 
 ```bash
-nx lint swift-package-manager
+# Set debug environment variable
+export NX_VERBOSE_LOGGING=true
+
+# Run commands with verbose output
+npx nx build my-project --verbose
 ```
 
-## Contributing
+### Getting Help
 
-Contributions are welcome! Please read our contributing guidelines and submit pull requests to our repository.
+- **Documentation**: Check the [complete documentation](./DEPENDENCY_MANAGEMENT.md)
+- **GitHub Issues**: [Report bugs and request features](https://github.com/nx-apple/toolkit/issues)
+- **Community**: Join our [Discord server](https://discord.gg/nx-apple)
+- **Stack Overflow**: Tag questions with `nx-apple`
 
-## License
+## 📖 API Reference
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Plugin Configuration Schema
+
+```typescript
+interface SwiftPackageManagerPluginOptions {
+  buildCommand?: string;
+  testCommand?: string; 
+  lintCommand?: string;
+  includeTestTargets?: boolean;
+  includeLintTargets?: boolean;
+  buildOutputPath?: string;
+  configurationOptions?: Record<string, string>;
+}
+```
+
+### Generator Schemas
+
+Detailed schemas are available in the plugin's `src/generators/*/schema.json` files.
+
+### Executor Schemas
+
+Executor options are documented in `src/executors/*/schema.json` files.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](../../CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/nx-apple/toolkit.git
+cd toolkit
+
+# Install dependencies
+npm install
+
+# Build the plugin
+npx nx build swift-package-manager
+
+# Run tests
+npx nx test swift-package-manager
+
+# Link for local development
+cd tools/swift-package-manager
+npm link
+```
+
+## 📄 License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Nx Team**: For building the amazing Nx platform
+- **Swift Community**: For the robust Swift Package Manager
+- **Contributors**: Everyone who helps make this plugin better
+
+---
+
+<div align="center">
+
+**Made with ❤️ for the Swift and Nx communities**
+
+[Documentation](./DEPENDENCY_MANAGEMENT.md) • [GitHub](https://github.com/nx-apple/toolkit) • [npm](https://www.npmjs.com/package/@nx-apple/swift-package-manager)
+
+</div>
