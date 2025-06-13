@@ -1,0 +1,44 @@
+{
+  "name": "swift-package-manager",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/swift-package-manager/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/tools/swift-package-manager",
+        "main": "tools/swift-package-manager/src/index.ts",
+        "tsConfig": "tools/swift-package-manager/tsconfig.lib.json",
+        "assets": [
+          "tools/swift-package-manager/*.md",
+          {
+            "input": "./tools/swift-package-manager/src",
+            "glob": "**/!(*.ts)",
+            "output": "./src"
+          },
+          {
+            "input": "./tools/swift-package-manager/src",
+            "glob": "**/*.d.ts",
+            "output": "./src"
+          },
+          {
+            "input": "./tools/swift-package-manager",
+            "glob": "generators.json",
+            "output": "."
+          },
+          {
+            "input": "./tools/swift-package-manager",
+            "glob": "executors.json",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

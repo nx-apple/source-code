@@ -1,0 +1,9 @@
+{
+  "executors": {
+    "swift": {
+      "implementation": "./dist/src/executors/swift/executor",
+      "schema": "./src/executors/swift/schema.json",
+      "description": "Execute Swift commands"
+    }
+  }
+}

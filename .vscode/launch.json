@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:source-code}/apps/test-executable",
+            "name": "Debug TestExecutable (apps/test-executable)",
+            "program": "${workspaceFolder:source-code}/apps/test-executable/.build/debug/TestExecutable",
+            "preLaunchTask": "swift: Build Debug TestExecutable (apps/test-executable)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:source-code}/apps/test-executable",
+            "name": "Release TestExecutable (apps/test-executable)",
+            "program": "${workspaceFolder:source-code}/apps/test-executable/.build/release/TestExecutable",
+            "preLaunchTask": "swift: Build Release TestExecutable (apps/test-executable)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:source-code}/apps/app",
+            "name": "Debug app (apps/app)",
+            "program": "${workspaceFolder:source-code}/apps/app/.build/debug/app",
+            "preLaunchTask": "swift: Build Debug app (apps/app)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:source-code}/apps/app",
+            "name": "Release app (apps/app)",
+            "program": "${workspaceFolder:source-code}/apps/app/.build/release/app",
+            "preLaunchTask": "swift: Build Release app (apps/app)"
+        }
+    ]
+}

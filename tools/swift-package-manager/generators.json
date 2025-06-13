@@ -1,0 +1,9 @@
+{
+  "generators": {
+    "swift-package": {
+      "factory": "./src/generators/swift-package/generator",
+      "schema": "./src/generators/swift-package/schema.json",
+      "description": "Create a new Swift package"
+    }
+  }
+}
