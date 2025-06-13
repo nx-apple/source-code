@@ -73,12 +73,13 @@ async function createSwiftPackageNode(
     }
 
     // Create full project configuration for new projects
+    const projectType = getProjectType(manifest);
     const projectConfig: ProjectConfiguration = {
       name: projectName,
       root: projectRoot,
-      projectType: 'library', // Could be 'application' for executables
+      projectType: projectType === 'application' ? 'application' : 'library',
       sourceRoot: joinPathFragments(projectRoot, 'Sources'),
-      tags: [`lang:swift`, `type:${getProjectType(manifest)}`],
+      tags: [`lang:swift`, `type:${projectType}`],
     };
 
     // Create targets for build, test, and lint
@@ -113,12 +114,19 @@ export const createDependencies: CreateDependencies<SwiftPackageManagerOptions> 
   const projectNameMap = new Map<string, string>();
   for (const [projectRoot, project] of Object.entries(context.projects)) {
     if (project.name) {
+      // Add the exact project name
       projectNameMap.set(project.name, projectRoot);
+      // Also add the lowercase version for case-insensitive lookup
+      projectNameMap.set(project.name.toLowerCase(), projectRoot);
+      // Also add the capitalized version for Swift target names
+      projectNameMap.set(project.name.charAt(0).toUpperCase() + project.name.slice(1), projectRoot);
     }
     // Also map by the directory name as fallback
     const dirName = projectRoot.split('/').pop();
     if (dirName) {
       projectNameMap.set(dirName, projectRoot);
+      projectNameMap.set(dirName.toLowerCase(), projectRoot);
+      projectNameMap.set(dirName.charAt(0).toUpperCase() + dirName.slice(1), projectRoot);
     }
   }
 
@@ -150,8 +158,18 @@ export const createDependencies: CreateDependencies<SwiftPackageManagerOptions> 
             if (dep.fileSystem) {
               for (const fsDep of dep.fileSystem) {
                 if (fsDep.path) {
+                  // Resolve the path relative to the current package directory
+                  let absolutePath: string;
+                  if (fsDep.path.startsWith('/')) {
+                    // Already absolute
+                    absolutePath = fsDep.path;
+                  } else {
+                    // Relative path - resolve it relative to the package directory
+                    absolutePath = join(packageDir, fsDep.path);
+                  }
+                  
                   // Convert absolute path to relative project root
-                  const targetProjectRoot = relative(context.workspaceRoot, fsDep.path);
+                  const targetProjectRoot = relative(context.workspaceRoot, absolutePath);
                   
                   // Find the target project
                   const targetProject = Object.keys(context.projects).find(project => 
