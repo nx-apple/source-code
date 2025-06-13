@@ -4,6 +4,16 @@
       "factory": "./src/generators/swift-package/generator",
       "schema": "./src/generators/swift-package/schema.json",
       "description": "Create a new Swift package"
+    },
+    "add-dependency": {
+      "factory": "./src/generators/add-dependency/generator",
+      "schema": "./src/generators/add-dependency/schema.json",
+      "description": "Add a dependency to a Swift package"
+    },
+    "remove-dependency": {
+      "factory": "./src/generators/remove-dependency/generator",
+      "schema": "./src/generators/remove-dependency/schema.json",
+      "description": "Remove a dependency from a Swift package"
     }
   }
 }

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "cli": "nx",
+  "$id": "AddSwiftDependency",
+  "title": "Add Swift Package Dependency",
+  "description": "Add a dependency to a Swift package",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the Swift package project to add the dependency to",
+      "$default": {
+        "$source": "projectName"
+      },
+      "x-prompt": "Which project would you like to add the dependency to?"
+    },
+    "dependencyType": {
+      "type": "string",
+      "description": "Type of dependency to add",
+      "enum": ["remote", "local"],
+      "default": "remote",
+      "x-prompt": {
+        "message": "What type of dependency would you like to add?",
+        "type": "list",
+        "items": [
+          {
+            "value": "remote",
+            "label": "Remote (GitHub/Git URL)"
+          },
+          {
+            "value": "local",
+            "label": "Local (Nx workspace project)"
+          }
+        ]
+      }
+    },
+    "url": {
+      "type": "string",
+      "description": "Git URL of the remote dependency (required for remote dependencies)",
+      "x-prompt": {
+        "message": "What is the Git URL of the dependency?",
+        "when": "dependencyType === 'remote'"
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "Version constraint for the remote dependency (e.g., '1.0.0', 'from: \"1.0.0\"', 'branch: \"main\"')",
+      "x-prompt": {
+        "message": "What version constraint would you like to use? (e.g., '1.0.0', 'from: \"1.0.0\"', 'branch: \"main\"')",
+        "when": "dependencyType === 'remote'"
+      }
+    },
+    "localProject": {
+      "type": "string",
+      "description": "Name of the local Nx project to depend on (required for local dependencies)",
+      "x-prompt": {
+        "message": "Which local Nx project would you like to depend on?",
+        "when": "dependencyType === 'local'"
+      }
+    },
+    "targets": {
+      "type": "array",
+      "description": "Target names within the project to add the dependency to (if not specified, adds to all applicable targets)",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "productName": {
+      "type": "string",
+      "description": "Specific product name from the dependency to import (optional, will use package name if not specified)"
+    }
+  },
+  "required": ["project", "dependencyType"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dependencyType": {
+            "const": "remote"
+          }
+        }
+      },
+      "then": {
+        "required": ["url"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dependencyType": {
+            "const": "local"
+          }
+        }
+      },
+      "then": {
+        "required": ["localProject"]
+      }
+    }
+  ]
+}
